@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chainpulse"
+version = "0.1.0"
+description = "Check the health of EVM RPC endpoints from your terminal."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "DaddyUnikii" }]
+keywords = ["ethereum", "rpc", "web3", "node", "monitoring", "cli"]
+
+[project.scripts]
+chainpulse = "chainpulse.cli:main"
+
+[tool.setuptools]
+packages = ["chainpulse"]
