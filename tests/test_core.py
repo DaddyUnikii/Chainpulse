@@ -4,7 +4,7 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from chainpulse.cli import render_table
+from chainpulse.cli import render_table, use_color
 from chainpulse.core import check, check_all
 
 
@@ -58,3 +58,32 @@ class ChainPulseTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TtyStream:
+    def isatty(self):
+        return True
+
+
+class ColorTest(unittest.TestCase):
+    def setUp(self):
+        self._saved = os.environ.pop("NO_COLOR", None)
+
+    def tearDown(self):
+        os.environ.pop("NO_COLOR", None)
+        if self._saved is not None:
+            os.environ["NO_COLOR"] = self._saved
+
+    def test_color_on_tty(self):
+        self.assertTrue(use_color(False, TtyStream()))
+
+    def test_no_color_flag(self):
+        self.assertFalse(use_color(True, TtyStream()))
+
+    def test_no_color_env(self):
+        os.environ["NO_COLOR"] = "1"
+        self.assertFalse(use_color(False, TtyStream()))
+
+    def test_empty_no_color_env_keeps_color(self):
+        os.environ["NO_COLOR"] = ""
+        self.assertTrue(use_color(False, TtyStream()))
