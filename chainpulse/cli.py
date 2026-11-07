@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -45,6 +46,14 @@ def render_table(results, color: bool = True) -> str:
     return "\n".join(out)
 
 
+def use_color(no_color_flag: bool, stream=None) -> bool:
+    """Color only on a TTY, unless --no-color or the NO_COLOR env var (https://no-color.org) says otherwise."""
+    if no_color_flag or os.environ.get("NO_COLOR"):
+        return False
+    stream = stream or sys.stdout
+    return hasattr(stream, "isatty") and stream.isatty()
+
+
 def load_endpoints(path: str | None) -> dict[str, str]:
     if not path:
         return DEFAULT_ENDPOINTS
@@ -63,7 +72,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("-u", "--url", action="append", help="check a single RPC URL (repeatable)")
     parser.add_argument("-t", "--timeout", type=float, default=DEFAULT_TIMEOUT, help="seconds per request")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
-    parser.add_argument("--no-color", action="store_true", help="disable colored output")
+    parser.add_argument("--no-color", action="store_true", help="disable colored output (also honors the NO_COLOR env var)")
     parser.add_argument("-V", "--version", action="version", version=f"chainpulse {__version__}")
     args = parser.parse_args(argv)
 
@@ -73,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps([r.to_dict() for r in results], indent=2))
     else:
-        print(render_table(results, color=not args.no_color and sys.stdout.isatty()))
+        print(render_table(results, color=use_color(args.no_color)))
     return 0 if all(r.ok for r in results) else 1
 
 

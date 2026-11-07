@@ -74,6 +74,7 @@ chainpulse
 | `chainpulse -c rpcs.example.json` | Check a list from a JSON file |
 | `chainpulse --json` | Machine-readable output for scripts and bots |
 | `chainpulse -t 3` | Timeout per request, in seconds |
+| `NO_COLOR=1 chainpulse` | Plain output without colors (same as `--no-color`, see [no-color.org](https://no-color.org)) |
 
 <details>
 <summary><b>📁 Config file format</b></summary>
